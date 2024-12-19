@@ -2,7 +2,7 @@
 
 function insert($time, $input, $result)
 {
-    $con = new mysqli("localhost", "root", "ubadagh098", "calculator", 3307);
+    $con = new mysqli("localhost", "root", "your_password", "calculator", port);
 
     if ($con->connect_error) {
         echo "<script>console.log('PHP says: Database connection failed:" . $con->connect_error . "');</script>";
