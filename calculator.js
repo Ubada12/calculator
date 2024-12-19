@@ -273,8 +273,11 @@
 
                 const buttons= Array.from(document.getElementsByClassName("number_btn"));
                 const special_btn= document.getElementById("brackets");
+                const backspace= document.getElementById("erase");
                 if(special_btn)
-                buttons.push(special_btn);
+                    buttons.push(special_btn);
+                if(backspace)
+                    buttons.push(backspace);
                 const textarea= document.getElementById("inputs");
                 for(let i= 0; i < buttons.length; i++)
                 {
