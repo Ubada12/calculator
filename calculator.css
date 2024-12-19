@@ -1,0 +1,225 @@
+            body{
+                font-family: 'Inconsolata', monospace; /*monospace is the fallback one*/
+                background-color: aquamarine;
+                text-align: center;
+            }
+            #main{
+                margin: 1%;
+                margin-top: 2%;
+            }
+            .history_tab_hidden{
+                background-color: white;
+                border: 1px solid blueviolet;
+                display: inline-block;
+                padding: 10px 2% 2% 2%;
+                width: 350px;
+                height: 465px;
+                text-align: right;
+                vertical-align: bottom;
+                opacity: 0; /* Fully transparent */
+                visibility: hidden; /* Element is hidden but still occupies space */
+                transition: opacity 0.6s ease-in-out 0.2s, visibility 0.6s ease-in-out 0.2s; /* Smooth transition */
+            }
+            .history_tab_visible{
+                background-color: white;
+                border: 1px solid blueviolet;
+                display: inline-block;
+                padding: 10px 2% 2% 2%;
+                width: 350px;
+                height: 465px;
+                text-align: right;
+                vertical-align: bottom;
+                opacity: 1; /* Fully visible */
+                visibility: visible; /* Element is visible */
+                transition: opacity 0.6s ease-in-out 0.2s, visibility 0.6s ease-in-out 0.2s; /* Smooth transition */
+            }
+            .converter_tab_hidden{
+                background-color: white;
+                border: 1px solid blueviolet;
+                display: inline-block;
+                padding: 2%;
+                width: 350px;
+                height: 445px;
+                vertical-align: bottom;
+                text-align: left;
+                overflow-y: auto;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.6s ease-in-out 0.2s, visibility 0.6s ease-in-out 0.2s; /* Smooth transition */
+            }
+            .converter_tab_visible{
+                background-color: white;
+                border: 1px solid blueviolet;
+                display: inline-block;
+                padding: 2%;
+                width: 350px;
+                height: 445px;
+                vertical-align: bottom;
+                text-align: left;
+                overflow-y: auto;
+                opacity: 1;
+                visibility: visible;
+                transition: opacity 0.6s ease-in-out 0.2s, visibility 0.6s ease-in-out 0.2s; /* Smooth transition */
+            }
+            #history_data_screen{
+                width: 350px;
+                height: 435px;
+                overflow-y: auto;
+                direction: rtl;
+            }
+            #history_no_data{
+                text-align: center;
+                padding-top: 50px;
+            }
+            h4{
+                font-size: 30px;
+            }
+            img{
+                width: 250px;
+                height: 250px;
+            }
+            .history_data{
+                line-height: 0.8;
+                padding: 1%;
+            }
+            p{
+                padding: 1%;
+                font-size: 22px;
+            }
+            .para_timestamp{
+                color: blue;
+            }
+            .para_input{
+                color: gray;
+            }
+            .para_result{
+                color: black;
+                font-weight: bold;
+                font-size: 25px;
+            }
+            #history_btn{
+                width: 350px; 
+                height: 30px; 
+                font-size: 20px; 
+                padding: 0%; 
+                margin: 0%;
+            }
+            #history_btn_screen{
+                margin-top: 20px;
+            }
+            #calculator{
+                display: inline-block;
+                border: 1px solid black;
+                width: 500px;
+                height: 780px;
+                
+                padding: 2%;
+                background-color: white;
+                text-align: left;
+            }
+            #screen{
+                padding: 3% 7% 3% 7%;
+                height: 180px;
+                text-align: left;
+            }
+            #buttons{
+                height: 520px;
+                text-align: center;
+                vertical-align: middle;
+            }
+            button{
+                text-align: center;
+                vertical-align: middle;
+                margin: 4%;
+                margin-bottom: 2%;
+                width: 70px;
+                height: 70px;
+                border-radius: 25px;
+                border: none;
+                font-size: 34px;
+                background-color: #f2f0f5;
+                outline: none;
+            }
+            button:hover{
+                background-color: #e3e2e7;
+                cursor: pointer;
+            }
+            #inputs{
+                border: none;
+                outline: none;
+                resize: none;
+                padding: 2%;
+                width: 430px;
+                height: 100px;
+                font-size: 65px;
+                overflow-x: auto;       /* Enable horizontal scrolling when content exceeds the width */
+                overflow-y: hidden;     /* Disable vertical scrolling */
+                white-space: nowrap;    /* Prevent text from wrapping to the next line */
+            }
+            #results{
+                resize: none;
+                padding: 2%;
+                vertical-align: middle;
+                width: 430px;
+                height: 80px;
+                font-size: 40px;
+                outline: none;
+                overflow-x: auto;
+                overflow-y: hidden;
+                white-space: nowrap;
+                border: none;
+            }
+            textarea{
+                transition: opacity 0.35s ease-in-out;
+            }
+            .hidden{
+                opacity: 0;
+            }
+            textarea::-webkit-scrollbar-track{
+                background: transparent; /* Color of the track */
+            }
+            /* Style the scrollbar itself */
+            textarea::-webkit-scrollbar{
+                width: 10px;
+            }
+            /* Style the scrollbar thumb */
+            textarea::-webkit-scrollbar-thumb{
+                background: transparent;
+                border-radius: 5px;
+            }
+            .special_btn{
+                background-color: #dbe2fc;
+            }
+            .special_btn:hover{
+                background-color: #dedbfc;
+            }
+            #addons{
+                display: inline-block;
+                margin-top: 20px;
+                width: 420px;
+                margin-left: 40px;
+            }
+            input{
+                background-color: rgba(0, 0, 0, 0); /* Transparent color */
+                background-repeat: no-repeat;
+                background-position: center;
+                background-size: 80%;
+                width: 40px;
+                height: 40px;
+                margin: 1%;
+                padding: 1%;
+                border: none;
+                border-radius: 50%;
+                outline: none;
+                transition: background-color, background-image 0.5s ease-in-out;
+            }
+            #history:hover{
+                cursor: pointer;
+                background-color: #dbe2fcc0;
+            }
+            #converter:hover{
+                cursor: pointer;
+            }
+            .history_hidden{
+                background-color: #dbe2fcc0;
+            }
