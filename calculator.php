@@ -24,7 +24,7 @@ function insert($time, $input, $result)
 
 function delete()
 {
-    $con = new mysqli("localhost", "root", "ubadagh098", "calculator", 3307);
+    $con = new mysqli("localhost", "root", "your_password", "calculator", 3307);
 
     if ($con->connect_error) {
         echo "<script>console.log('PHP says: Database connection failed:" . $con->connect_error . "');</script>";
@@ -43,7 +43,7 @@ function delete()
 
 function setup()
 {
-    $con = new mysqli("localhost", "root", "ubadagh098", "", 3307);
+    $con = new mysqli("localhost", "root", "your_password", "", 3307);
 
     if ($con->connect_error) {
         echo "<script>console.log('PHP says: Database connection failed:" . $con->connect_error . "');</script>";
