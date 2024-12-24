@@ -138,55 +138,70 @@
                 }
                 textarea_str= textarea_str.replace(/÷/g, "/");// g flag to replace all occurence
                 textarea_str= textarea_str.replace(/X/g, "*");
+                textarea_str= textarea_str.replace(/,/g, "");
                 return textarea_str;
             }
-            function result()
+            function calc_result()
             {
                 const input= document.getElementById('inputs');
-                const result= document.getElementById('results');
+                const results= document.getElementById('results');
                 let date= new Date();
-                const proper_date= date.getHours() +"-"+ date.getMinutes() +"-"+ date.getDate()+1 +"-"+ date.getMonth() +"-"+ date.getFullYear();
+                const proper_date= date.getFullYear() +"-"+ (date.getMonth()+1) +"-"+ date.getDate() +" "+ date.getHours() +":"+ date.getMinutes();
                 const input_value= input.value;
-                const result_value= result.value;
+                const result_value= results.value;
 
-                if(result.value.length !== 0)
+                if(results.value.length !== 0)
                 {
-                    result.classList.add("hidden");
+                    results.classList.add("hidden");
                     input.classList.add("hidden");
 
                     setTimeout(function() {
-                        if(result.value.length !== 0)
+                        if(results.value.length !== 0)
                         {
-                            input.innerHTML= result.value;
-                            result.innerHTML= '';
-                            result.classList.remove("hidden");
+                            input.innerHTML= results.value;
+                            results.innerHTML= '';
+                            results.classList.remove("hidden");
                             input.classList.remove("hidden");
                         }
                     }, 350);
-                    send_AJAX_request(proper_date, input_value, result_value);
+                    send_AJAX_request(proper_date, input_value, result_value, "insert");
+                    
                 }
             }
-            function send_AJAX_request(date, input, result) 
+            function send_AJAX_request(date, input, result, action) 
             {
                 const xhr = new XMLHttpRequest();
                 xhr.open("POST", "calculator.php", true);
                 xhr.setRequestHeader("Content-type", "application/json");
-                const params = JSON.stringify({ action: "insert", time: date, input: input, result: result });
+                const params = JSON.stringify({ action: action, time: date, input: input, result: result });
                 xhr.onerror = function() {
                     console.error("An error occurred during the AJAX request");
                 };
                 xhr.onload = function() {
-                    if (this.status === 200) 
+                    if (this.status === 200)
+                    {
                         console.log("Successfully sent data to the server");
+                        addHistoryData();
+                    }    
                     else
                         console.log("Failed to send data");
+                };
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        const jsonResponse = JSON.parse(xhr.responseText);
+                        console.log('Server Response:', jsonResponse);
+                    }
                 };
                 xhr.send(params);
             }
             function history_clear()
             {
                 if (confirm("Do you want to delete all history?"))
+                {
                     console.log("User clicked OK");
+                    send_AJAX_request("", "", "", "delete");
+                    document.getElementById("history_data_screen").innerHTML= `<div id="history_no_data"><img src="images/no_data.gif" alt="no data available"><h4>No Data</h4></div>`;
+                }
                 else 
                     console.log("User clicked Cancel");
             }
@@ -205,16 +220,17 @@
                     converter.classList.add('converter_tab_hidden');
                 }
             }
+
             function addTransitionsForHistory() 
             {
                 const history = document.getElementById("history");
                 const historyTab = document.getElementById("history_tab");
 
                 // Toggle the background image of the button
-                if (history.style.backgroundImage.includes("history_after.png")) 
-                    history.style.backgroundImage = "url('history.png')";
+                if (history.style.backgroundImage.includes("images/history_after.png")) 
+                    history.style.backgroundImage = "url('images/history.png')";
                 else 
-                    history.style.backgroundImage = "url('history_after.png')";
+                    history.style.backgroundImage = "url('images/history_after.png')";
 
                 history.classList.add("history_hidden");
                 setTimeout(function() {
@@ -231,7 +247,93 @@
                     historyTab.classList.remove('history_tab_visible');
                     historyTab.classList.add('history_tab_hidden');
                 }
+                addHistoryData();
             }
+
+            function addHistoryData()
+            {
+                const historyDataScreen= document.getElementById("history_data_screen");
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "calculator.php", true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+
+                // Correctly create the data object and stringify it
+                const data = JSON.stringify({ action: "result" });
+
+                xhr.onerror = function () {
+                    console.error("An error occurred during the AJAX post request");
+                };
+
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        console.log("Successfully sent post request");
+                        // Parse the response and log it
+                        const jsonResponse = JSON.parse(xhr.responseText);
+                        console.log("Server Response:", jsonResponse);
+
+                        if(jsonResponse.status === "present")
+                        {
+                            if(document.getElementById("history_no_data"))
+                                document.getElementById("history_no_data").remove();
+                            historyDataScreen.innerHTML= "";
+                            for(let i= 0; i<jsonResponse.data.length; i++)
+                            {
+                                const time= jsonResponse.data[i]['time'];
+                                const input= jsonResponse.data[i]['input'];
+                                const result= jsonResponse.data[i]['result'];
+                                historyDataScreen.innerHTML+= `<div class="history_data"><p class="para_timestamp">Timestamp: `+time+`</p><p class="para_input">Input: `+input+`</p><p class="para_result">Result: `+result+`</p></div><hr>`;
+                                historyDataScreen.scrollTop = historyDataScreen.scrollHeight - historyDataScreen.clientHeight;
+                            }
+                        }
+                        else if(jsonResponse.status === "absent")
+                        {
+                            console.log("No data found");
+                            historyDataScreen.innerHTML= `<div id="history_no_data"><img src="images/no_data.gif" alt="no data available"><h4>No Data</h4></div>`;
+                        }
+                    } else {
+                        console.error("Failed to send post request. Status:", xhr.status);
+                    }
+                };
+
+                // Send the JSON stringified data
+                xhr.send(data);
+            }
+
+            function insertStringAtIndex(ogStr, index, insertingStr) 
+            {
+                // Ensure the index is within the bounds of the original string
+                if (index < 0 || index > ogStr.length) {
+                    return "Error: Index out of bounds";
+                }
+                // Insert the string at the specified index
+                return ogStr.slice(0, index) + insertingStr + ogStr.slice(index);
+            }
+
+            function setNumberCommas(str) {
+                if (!str.length) return str; // Return the original string if empty
+                
+                // Match all groups of digits in the string
+                const matches = str.match(/\d+/g); 
+                if (!matches) return str; // Return the original string if no numbers found
+            
+                // Iterate over matches and process valid numbers
+                matches.forEach(match => {
+                    const index = str.indexOf(match); 
+                    const precedingChar = index > 0 ? str[index - 1] : "";
+            
+                    // Skip numbers preceded by '.' or ',' or shorter than 4 digits
+                    if (precedingChar === "." || precedingChar === "," || match.length <= 3) return;
+            
+                    // Add commas to the matched number
+                    const formattedNumber = match.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            
+                    // Replace original number with formatted number in the string
+                    str = str.replace(match, formattedNumber);
+                });
+            
+                return str;
+            }
+            
 
             document.addEventListener('DOMContentLoaded', function() {
                 const all_buttons= document.querySelectorAll("button, input, textarea");
@@ -245,22 +347,11 @@
                     });
                 }
 
-                const history_tab= document.getElementById("history_data_screen");
-                if(history_tab.innerHTML.trim().length === 0)
-                {
-                    console.log("no data");
-                }
-                else
-                {
-                    console.log("data is present");
-                    console.log(history_tab.innerHTML.trim());
-                }
-
                 document.addEventListener("keydown", function(event) {
                     if(event.key === "Enter")
                     {
                         event.preventDefault();
-                        result();
+                        calc_result();
                     }
                 });
 
@@ -285,20 +376,14 @@
                         setTimeout(function() {
                             try
                             {
-                                const result= eval(validate_input(textarea.value));
-                                // Check if the result is an integer or a floating-point number
-                                if (Number.isInteger(result)) {
-                                    // If it's an integer, don't apply precision
-                                    document.getElementById("results").innerHTML = result;
-                                } else {
-                                    // If it's a floating-point number, apply precision
-                                    const limitedResult = result.toFixed(7);  // Limit to 2 decimal places for floats
-                                    document.getElementById("results").innerHTML = limitedResult;
-                                }
+                                textarea.innerHTML= setNumberCommas(textarea.value.replace(/,/g, ""));
+                                const result= setNumberCommas(eval(validate_input(textarea.value)).toString());
+                                document.getElementById("results").innerHTML = result;
                             }
                             catch(error)
                             {
-                                console.log("invalid expression");
+                                document.getElementById("results").innerHTML= "";
+                                console.log("invalid expression: "+error);
                             }
                         }, 50);
                     });

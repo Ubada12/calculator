@@ -13,6 +13,7 @@
     <div id="main">
         <div id="history_tab" class="history_tab_hidden">
             <div id="history_data_screen">
+                <div id="history_no_data"><img src="images/no_data.gif" alt="no data available"><h4>No Data</h4></div>
             </div>
             <div id="history_btn_screen">
                 <button type="button" id="history_btn" onclick="history_clear()">Clear History</button>
@@ -24,8 +25,8 @@
                 <textarea readonly id="results"></textarea>
             </div>
             <div id="addons">
-                <input type="button" id="history" onclick="addTransitionsForHistory()" style="background-image: url('history.png');">
-                <input type="button" id="converter" onclick="addTransitionsForConverter()" style="background-image: url('exchange.gif'); width: 60px; height: 60px;">
+                <input type="button" id="history" onclick="addTransitionsForHistory()" style="background-image: url('images/history.png');">
+                <input type="button" id="converter" onclick="addTransitionsForConverter()" style="background-image: url('images/exchange.gif'); width: 60px; height: 60px;">
             </div>
             <div id="buttons">
                 <button type="button" class="special_btn" id="ac" onclick="clearInput()">AC</button>
@@ -47,7 +48,7 @@
                 <button type="button" id="percentage" onclick="percentage()">%</button>
                 <button type="button" class="number_btn" id="0" onclick="document.getElementById('inputs').innerHTML= document.getElementById('inputs').value+'0';">0</button>
                 <button type="button" style="font-size: 50px;" id="point" onclick="point()">.</button>
-                <button type="button" class="special_btn" style="font-size: 50px;" id="result" onclick="result()">=</button>
+                <button type="button" class="special_btn" style="font-size: 50px;" id="result" onclick="calc_result()">=</button>
             </div>
         </div>
         <div id="converter_tab" class="converter_tab_hidden">

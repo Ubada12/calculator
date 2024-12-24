@@ -66,6 +66,9 @@
                 height: 435px;
                 overflow-y: auto;
                 direction: rtl;
+                overflow-wrap: break-word; /* Ensure words break to the next line */
+                word-wrap: break-word;    /* For older browsers */
+                white-space: normal;      /* Prevent text from staying in a single line */
             }
             #history_no_data{
                 text-align: center;
