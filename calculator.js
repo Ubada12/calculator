@@ -1,6 +1,9 @@
 // https://youtu.be/CO_DAXswOrc?si=YRjByNZzGWtQ4Ijb watch this full video and understand the most important concepts which is bubbling and propagation events in javascript.
 // https://www.youtube.com/watch?v=FJZEVmF3eDg ajax 
             let lockPointBtn= false;
+            let number_buttons_locked= false;
+            let rates= null;
+            let clicked_button= null;
             function handle_mousup(textarea_value)
             {
                 console.log(textarea_value);
@@ -88,27 +91,58 @@
             function clearInput()
             {
                 lockPointBtn= false;
-                document.getElementById('inputs').innerHTML = '';
-                document.getElementById('results').innerHTML = '';
+                const converter_tab= document.getElementById("converter_tab");
+                if(converter_tab.classList.contains("converter_tab_hidden"))
+                {
+                    document.getElementById('inputs').innerHTML = '';
+                    document.getElementById('results').innerHTML = '';
+                }
+                else if(converter_tab.classList.contains("converter_tab_visible"))
+                {
+                    document.getElementById('source_currency_value').value = '';
+                    document.getElementById('target_currency_value').value = '';
+                }
             }
             function backspace()
             {
+                const sc_input= document.getElementById('source_currency_value');
                 const textarea= document.getElementById("inputs");
-                let str= textarea.value;
+                const converter_tab= document.getElementById("converter_tab");
+                if(converter_tab.classList.contains("converter_tab_hidden"))
+                {
+                    let str= textarea.value;
 
-                if(str[str.length - 1] === ".")
-                lockPointBtn= false;
-                textarea.innerHTML= str.substring(0, str.length-1);
+                    if(str[str.length - 1] === ".")
+                        lockPointBtn= false;
+
+                    textarea.innerHTML= str.substring(0, str.length-1);
+                }
+                else if(converter_tab.classList.contains("converter_tab_visible"))
+                {
+                    let str= sc_input.value;
+                    sc_input.value = str.substring(0, str.length-1);
+                }
+                
             }
             function point()
             {
+                const converter_tab= document.getElementById("converter_tab");
+                const sc_input= document.getElementById('source_currency_value');
                 const textarea= document.getElementById("inputs");
-                let str= textarea.value;
 
-                if((str.length !== 0) && (/^\d$/.test(str[str.length - 1])) && (str[str.length-1] !== ".") && (!lockPointBtn))
+                if(converter_tab.classList.contains("converter_tab_hidden"))
                 {
-                    lockPointBtn= true;
-                    document.getElementById('inputs').innerHTML= document.getElementById('inputs').value+'.';
+                    let str= textarea.value;
+
+                    if((str.length !== 0) && (/^\d$/.test(str[str.length - 1])) && (str[str.length-1] !== ".") && (!lockPointBtn) && (!number_buttons_locked))
+                    {
+                        lockPointBtn= true;
+                        document.getElementById('inputs').innerHTML= document.getElementById('inputs').value+'.';
+                    }
+                }
+                else if(converter_tab.classList.contains("converter_tab_visible") && !sc_input.value.includes("."))
+                {
+                    sc_input.value+= ".";
                 }
             }
             function validate_input(textarea_str)
@@ -211,13 +245,17 @@
 
                 if (converter.classList.contains('converter_tab_hidden')) 
                 {
+                    number_buttons_locked= true;
                     converter.classList.remove('converter_tab_hidden');
                     converter.classList.add('converter_tab_visible');
                 } 
                 else 
                 {
+                    number_buttons_locked= false;
                     converter.classList.remove('converter_tab_visible');
                     converter.classList.add('converter_tab_hidden');
+                    document.getElementById("source-currency").value= "";
+                    document.getElementById("target-currency").value= "";
                 }
             }
 
@@ -334,8 +372,157 @@
                 return str;
             }
             
+            function getExchangeRates()
+            {
+                return new Promise((resolve, reject) => {
+                    const xhr= new XMLHttpRequest();
+                    xhr.open("GET", "https://v6.exchangerate-api.com/v6/4e119fd486e9fb60d2aae21c/latest/USD", true);
+                    xhr.onerror = function () {
+                        reject("An error occurred during the AJAX post request");
+                    };
+                    xhr.onload = function () {
+                        if (xhr.status === 200) 
+                        {
+                            console.log("Successfully sent get request");
+                            // Parse the response and log it
+                            const jsonResponse = JSON.parse(xhr.responseText);
+                            console.log("Server Response:", jsonResponse);
+                            rates= jsonResponse.conversion_rates;
+                            // Populate datalists
+                            let options = `<option value=""></option>`;
+                            for (const key in rates) 
+                            {
+                                options += `<option value="${key}">${key}</option>`;
+                            }
+                            resolve(options);
+                        }
+                        else 
+                        {
+                            reject("Failed to send get request. Status:", xhr.status);
+                        }
+                    };
+                    xhr.send();
+                });
+            }
+
+            function currency_exchanger()
+            {
+                const choice= document.getElementById("choices");
+                getExchangeRates()
+                    .then((options) => {
+                        choice.innerHTML= options; // Populate datalist
+                        console.log("Options added to datalist");
+                        const script = document.createElement('script');
+                        script.src = "https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js";//imported js file after populating
+                        script.onload = function () {
+                            // Initialize Choices.js after the script is loaded
+                            const choices = new Choices('#choices', {
+                                searchEnabled: true, // Enable search functionality
+                                shouldSort: false,   // Maintain the original order
+                                placeholder: true,
+                                placeholderValue: '🔍 Search'
+                            });
+                        };
+                        document.body.appendChild(script);
+                    })
+                   .catch((error) => console.error(error));
+            }
+
+            function show_converter_div()
+            {
+                const converter_tab= document.getElementById("comman_converter_div");
+                if(converter_tab.classList.contains("comman_converter_div_hidden"))
+                {
+                        converter_tab.classList.remove("comman_converter_div_hidden");
+                        converter_tab.classList.add("comman_converter_div_visible");
+                }
+            }
+
+            function close()
+            {
+                const comman_converter_div= document.getElementById("comman_converter_div");
+                if(comman_converter_div.classList.contains("comman_converter_div_visible"))
+                {
+                    comman_converter_div.classList.remove("comman_converter_div_visible");
+                    comman_converter_div.classList.add("comman_converter_div_hidden");
+                }
+            }
+
+            function actual_conversion(sc_symbol, tc_symbol, sc_input) 
+            {
+                return new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open("GET", `https://v6.exchangerate-api.com/v6/4e119fd486e9fb60d2aae21c/latest/${sc_symbol}`, true);
+            
+                    xhr.onerror = function () {
+                        reject("An error occurred during the AJAX GET request.");
+                    };
+            
+                    xhr.onload = function () {
+                        if (xhr.status === 200) 
+                        {
+                            console.log("Successfully sent GET request");
+            
+                            // Parse the response
+                            const jsonResponse = JSON.parse(xhr.responseText);
+                            console.log("Server Response:", jsonResponse);
+            
+                            if (jsonResponse.base_code !== sc_symbol) 
+                            {
+                                reject(`Request was successful, but the source currency (${sc_symbol}) does not match the API response base code (${jsonResponse.base_code}).`);
+                                return;
+                            }
+                            
+                            const actual_rate= jsonResponse.conversion_rates[tc_symbol];
+                            console.log(`Exchange rate for 1 ${sc_symbol} to ${tc_symbol} is: ${actual_rate}`);
+                            const converted_value = sc_input * actual_rate;
+                            console.log(`Exchange rate for ${sc_input} ${sc_symbol} to ${tc_symbol} is: ${converted_value}`);
+                            resolve(converted_value);
+                        } 
+                        else 
+                        {
+                            reject(`Failed to send GET request. HTTP Status: ${xhr.status}`);
+                        }
+                    };
+            
+                    xhr.send();
+                });
+            }
+            
 
             document.addEventListener('DOMContentLoaded', function() {
+                currency_exchanger();
+                
+                const choices= document.getElementById("choices");
+                const converter_tab= document.getElementById("comman_converter_div");
+                choices.addEventListener("change", function() {
+                    if(clicked_button !== null)
+                    {
+                        if(clicked_button.id === "exchange_sc")
+                            document.getElementById("source-currency").value= choices.value;
+                        else if(clicked_button.id === "exchange_tc")
+                            document.getElementById("target-currency").value= choices.value;
+                    }
+                    if(converter_tab.classList.contains("comman_converter_div_visible"))
+                    {
+                        converter_tab.classList.remove("comman_converter_div_visible");
+                        converter_tab.classList.add("comman_converter_div_hidden");
+                    }
+                });
+
+                const options_buttons= Array.from(document.getElementsByClassName("exchange"));
+                for(let i= 0; i<options_buttons.length; i++)
+                {
+                    options_buttons[i].addEventListener("click", function() {
+                        show_converter_div();
+                        if(converter_tab.classList.contains("comman_converter_div_visible"))
+                            clicked_button= options_buttons[i];
+                    });
+                }
+
+                const close_button= document.getElementById("close_window");
+                close_button.addEventListener("click", close);
+
                 const all_buttons= document.querySelectorAll("button, input, textarea");
                 for(let i= 0; i< all_buttons.length; i++)
                 {
@@ -343,6 +530,35 @@
                         if (event.key === 'Enter') 
                         {
                             event.preventDefault();  // Prevent the Enter key from adding a new line
+                        }
+                    });
+                }
+
+                const keys= Array.from(document.getElementsByClassName("number_btn"));
+                const point_key= document.getElementById("point");
+                const currency_tab_div= document.getElementById("converter_tab");
+                const sc_input= document.getElementById('source_currency_value');
+                const tc_input= document.getElementById('target_currency_value');
+                const sc_symbol= document.getElementById('source-currency');
+                const tc_symbol= document.getElementById('target-currency');
+                if(point_key)
+                    keys.push(point_key, document.getElementById("erase"));
+                for(let i=0; i<keys.length; i++)
+                {
+                    keys[i].addEventListener("click", function() {
+                        if(keys[i].innerHTML === ".")
+                            point();
+                        else if(!number_buttons_locked && keys[i].id !== "erase")
+                            document.getElementById('inputs').innerHTML= document.getElementById('inputs').value + keys[i].innerHTML;
+                        else if(currency_tab_div.classList.contains("converter_tab_visible") && keys[i].id !== "erase")
+                            sc_input.value+= keys[i].innerHTML;
+                        if(currency_tab_div.classList.contains("converter_tab_visible") && sc_input.value !== 0 && sc_symbol.value !== 0 && tc_symbol.value !== 0)
+                        {
+                            actual_conversion(sc_symbol.value, tc_symbol.value, sc_input.value)
+                                .then((converted_value) => {
+                                    tc_input.value= converted_value;
+                                })
+                                .catch((error) => console.log(error));
                         }
                     });
                 }
@@ -357,8 +573,12 @@
 
                 document.addEventListener('mouseup', function() {
                     setTimeout(function() {
-                        const textarea= document.querySelector("textarea");
-                        textarea.scrollLeft = textarea.scrollWidth - textarea.clientWidth;// here this whole statement sends the slider pointer to the rightmost here scrollleft is the scrollbar movable slider pointer and scrollwidth is the width of the whole textarea(including the hidden one) and the clientwidth is the width of the textarea which is visible.
+                        const inputs_buttons= Array.from(document.getElementById("target_currency_value"));
+                        inputs_buttons.push(document.querySelector("textarea"), document.getElementById("source_currency_value"), document.getElementById("target_currency_value"));
+                        for(let i= 0; i<inputs_buttons.length; i++)
+                        {
+                            inputs_buttons[i].scrollLeft= inputs_buttons[i].scrollWidth - inputs_buttons[i].clientWidth;
+                        }
                     }, 50);
                 });//here we add a timeout function becoz the scrollwidth and clientwidth are having different values see we want these values when the mouseup done so when we dont add these timeout function then this values will be of the time when mouse up is down but we want values after mouseup done.
 
@@ -370,15 +590,24 @@
                 if(backspace)
                     buttons.push(backspace);
                 const textarea= document.getElementById("inputs");
+                const convert_currency_input= document.getElementById("source_currency_value");
+                const converter_tab_div= document.getElementById("converter_tab");
                 for(let i= 0; i < buttons.length; i++)
                 {
                     buttons[i].addEventListener("mouseup", function() {
                         setTimeout(function() {
                             try
                             {
-                                textarea.innerHTML= setNumberCommas(textarea.value.replace(/,/g, ""));
-                                const result= setNumberCommas(eval(validate_input(textarea.value)).toString());
-                                document.getElementById("results").innerHTML = result;
+                                if(textarea.innerHTML.length !== 0 && converter_tab_div.classList.contains("converter_tab_hidden"))
+                                {
+                                    textarea.innerHTML= setNumberCommas(textarea.value.replace(/,/g, ""));
+                                    const result= setNumberCommas(eval(validate_input(textarea.value)).toString());
+                                    document.getElementById("results").innerHTML = result;
+                                }
+                                else if(convert_currency_input.value !== 0 && converter_tab_div.classList.contains("converter_tab_visible"))
+                                {
+                                    convert_currency_input.value= setNumberCommas(convert_currency_input.value.replace(/,/g, ""));
+                                }
                             }
                             catch(error)
                             {

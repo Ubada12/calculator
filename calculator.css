@@ -37,9 +37,9 @@
                 background-color: white;
                 border: 1px solid blueviolet;
                 display: inline-block;
-                padding: 2%;
-                width: 350px;
-                height: 445px;
+                padding: 1%;
+                width: 400px;
+                height: 500px;
                 vertical-align: bottom;
                 text-align: left;
                 overflow-y: auto;
@@ -51,15 +51,56 @@
                 background-color: white;
                 border: 1px solid blueviolet;
                 display: inline-block;
-                padding: 2%;
-                width: 350px;
-                height: 445px;
+                padding: 1%;
+                width: 400px;
+                height: 500px;
                 vertical-align: bottom;
                 text-align: left;
                 overflow-y: auto;
                 opacity: 1;
                 visibility: visible;
                 transition: opacity 0.6s ease-in-out 0.2s, visibility 0.6s ease-in-out 0.2s; /* Smooth transition */
+            }
+            button.exchange{
+                text-align: center;
+                vertical-align: middle;
+                font-size: 20px; 
+                padding: 0%; 
+                border-radius: 50%;
+                width: 35px;
+                height: 35px;
+                transform: translateY(-10px);
+                margin: 0% 0% 0% 10%;
+                color: #4380c2a2;
+            }
+            form{
+                height: 480px;
+                padding: 2%;
+                border: 1px solid black;
+            }
+            #target-currency, #source-currency{
+                width: 100px;
+                height: 30px;
+                font-size: 30px;
+                border-radius: 0%;
+                padding: 1%;
+            }
+            #source_currency_value, #target_currency_value{
+                border: 1px solid black;
+                width: 95%;
+                height: 80px;
+                font-size: 60px;
+                border-radius: 0%;
+                margin-top: 5%;
+                margin-bottom: 5%;
+            }
+            label{
+                height: 30px;
+                display: inline-block;
+                padding: 1%;
+                margin-bottom: 1%;
+                font-size: 20px;
+                transform: translateY(-5px);
             }
             #history_data_screen{
                 width: 350px;
@@ -129,6 +170,16 @@
                 height: 520px;
                 text-align: center;
                 vertical-align: middle;
+            }
+            #close_window{
+                padding: 1%;
+                width: 30px;
+                height: 30px;
+                margin: 1%;
+                margin-bottom: 3%;
+                font-size: 17px;
+                background-color: transparent;
+                transform: translateX(365px);
             }
             button{
                 text-align: center;
@@ -225,4 +276,39 @@
             }
             .history_hidden{
                 background-color: #dbe2fcc0;
+            }
+            div.comman_converter_div_hidden{
+                border: 1px solid black;
+                width: 400px;
+                height: 500px;
+                background-color: white;
+                padding: 2%;
+                position: absolute;
+                transform: translateY(-710px);
+                margin-left: 0.7%;
+                display: inline-block;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.6s ease-in-out 0.2s, visibility 0.6s ease-in-out 0.2s;  /*Smooth transition */
+            }
+            div.comman_converter_div_visible{
+                border: 1px solid black;
+                width: 400px;
+                height: 500px;
+                background-color: white;
+                padding: 2%;
+                position: absolute;
+                transform: translateY(-710px);
+                margin-left: 0.7%;
+                display: inline-block;
+                opacity: 1;
+                visibility: visible;
+                transition: opacity 0.6s ease-in-out 0.2s, visibility 0.6s ease-in-out 0.2s;  /*Smooth transition */
+            }
+            /*below two are the classes of choices.js libraries to style the select tag ciontents*/
+            div.choices__inner{
+                width: 96%;
+            }
+            .choices__list--single .choices__item {
+                font-size: 25px;
             }
