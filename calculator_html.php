@@ -60,16 +60,25 @@
             </div>
         </div>
         <div id="converter_tab" class="converter_tab_hidden">
+            <div id="toggle_div">
+                <span id="fiat" style="text-align: end; font-weight: bold;">FIAT CURRENCY</span>
+                <input type="checkbox" id="toggle">
+                <label for="toggle" id="label"></label>
+                <span id="crypto">CRYPTO CURRENCY</span>
+            </div>
             <form>
                 <label for="source-currency">Source Currency:</label>
                 <input list="source-currencies" id="source-currency" name="source-currency" readonly>
                 <button type="button" id="exchange_sc" class="exchange">></button>
                 <input type="text" id="source_currency_value" readonly>
-            
+
+                <button type="button" id="swap_values" onclick="swapValues()"></button>
+
                 <label for="target-currency">Target Currency:</label>
                 <input list="target-currencies" id="target-currency" name="target-currency" readonly>
                 <button type="button" id="exchange_tc" class="exchange">></button>
                 <input type="text" id="target_currency_value" readonly>
+                <p style="color: red;"></p>
                 </form> 
         </div>
     </div>

@@ -1,19 +1,78 @@
             body{
                 font-family: 'Inconsolata', monospace; /*monospace is the fallback one*/
-                background-color: aquamarine;
+                background-color: #E3F2FD;
                 text-align: center;
             }
             #main{
                 margin: 1%;
                 margin-top: 2%;
             }
-            .history_tab_hidden{
+            #toggle_div{
+                display: flex;
+                justify-content: center; /* Centers horizontally */
+                align-items: center;     /* Centers vertically */
+                margin: 1%;
+                padding: 1%;
+                width: 385px;
+                height: 40px;
+            }
+            #toggle{
+                width: 15px;
+                height: 15px;
+                margin: 0%;
+                padding: 0%;
+                display: none;
+            }
+            #label{
+                display: inline-block;
+                background-color: grey;
+                width: 64px;
+                height: 30px;
+                border-radius: 20px;
+                transition: background-color 0.3s linear, border 0.3s linear; /* Transition background color smoothly */
+                margin: 3.2% 0% 1% 0%;
+                cursor: pointer;
+                position: relative;
+            }
+            #label::before {
+                content: "";
+                display: inline-block;
+                width: 33px;
+                height: 31px;
                 background-color: white;
-                border: 1px solid blueviolet;
+                border-radius: 50%;
+                transition: transform 0.3s linear; /* Transition movement of the circle */
+            }
+            span{
+                width: 50px;
+                font-size: 15px;
+                margin-left: 10%;
+                margin-right: 11%;
+            }
+            input[type="checkbox"]:checked + #label {
+                background-color: #7983ff; /* Change the background color when checked */
+            }
+            input[type="checkbox"]:checked + #label::before {
+                transform: translate(30.5px, 0); /* Move the circle when checked */
+            }
+            #swap_values{
+                display: block;
+                margin-left: 42%;
+                width: 50px;
+                height: 50px;
+                background-color: rgba(0, 0, 0, 0); /* Transparent color */
+                background-repeat: no-repeat;
+                background-position: center;
+                background-size: 80%;
+                background-image: url("images/swap.png");
+            }
+            .history_tab_hidden{
+                box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.25); /* Shadow inside the box */
+                background-color: white;
                 display: inline-block;
                 padding: 10px 2% 2% 2%;
                 width: 350px;
-                height: 465px;
+                height: 570px;
                 text-align: right;
                 vertical-align: bottom;
                 opacity: 0; /* Fully transparent */
@@ -21,12 +80,12 @@
                 transition: opacity 0.6s ease-in-out 0.2s, visibility 0.6s ease-in-out 0.2s; /* Smooth transition */
             }
             .history_tab_visible{
+                box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.25); /* Shadow inside the box */
                 background-color: white;
-                border: 1px solid blueviolet;
                 display: inline-block;
                 padding: 10px 2% 2% 2%;
                 width: 350px;
-                height: 465px;
+                height: 570px;
                 text-align: right;
                 vertical-align: bottom;
                 opacity: 1; /* Fully visible */
@@ -34,32 +93,32 @@
                 transition: opacity 0.6s ease-in-out 0.2s, visibility 0.6s ease-in-out 0.2s; /* Smooth transition */
             }
             .converter_tab_hidden{
+                box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.25); /* Shadow inside the box */
                 background-color: white;
-                border: 1px solid blueviolet;
                 display: inline-block;
                 padding: 1%;
-                width: 400px;
-                height: 500px;
+                width: 410px;
+                height: 570px;
                 vertical-align: bottom;
                 text-align: left;
                 overflow-y: auto;
                 opacity: 0;
                 visibility: hidden;
-                transition: opacity 0.6s ease-in-out 0.2s, visibility 0.6s ease-in-out 0.2s; /* Smooth transition */
+                transition: opacity 0.6s ease-in-out 0.2s, visibility 0.6s ease-in-out 0.2s, box-shadow 0.3s ease-in-out; /* Smooth transition */
             }
             .converter_tab_visible{
+                box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.25); /* Shadow inside the box */
                 background-color: white;
-                border: 1px solid blueviolet;
                 display: inline-block;
                 padding: 1%;
-                width: 400px;
-                height: 500px;
+                width: 410px;
+                height: 570px;
                 vertical-align: bottom;
                 text-align: left;
                 overflow-y: auto;
                 opacity: 1;
                 visibility: visible;
-                transition: opacity 0.6s ease-in-out 0.2s, visibility 0.6s ease-in-out 0.2s; /* Smooth transition */
+                transition: opacity 0.6s ease-in-out 0.2s, visibility 0.6s ease-in-out 0.2s, box-shadow 0.3s ease-in-out; /* Smooth transition */; /* Smooth transition */
             }
             button.exchange{
                 text-align: center;
@@ -74,9 +133,9 @@
                 color: #4380c2a2;
             }
             form{
-                height: 480px;
+                height: 410px;
                 padding: 2%;
-                border: 1px solid black;
+                margin-top: 10px;
             }
             #target-currency, #source-currency{
                 width: 100px;
@@ -84,9 +143,10 @@
                 font-size: 30px;
                 border-radius: 0%;
                 padding: 1%;
+                transition: box-shadow 0.3s ease-in-out; /* Smooth transition */
             }
             #source_currency_value, #target_currency_value{
-                border: 1px solid black;
+                box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.25); /* Shadow inside the box */
                 width: 95%;
                 height: 80px;
                 font-size: 60px;
@@ -102,9 +162,9 @@
                 font-size: 20px;
                 transform: translateY(-5px);
             }
-            #history_data_screen{
+            #history_data_screen {
                 width: 350px;
-                height: 435px;
+                height: 530px;
                 overflow-y: auto;
                 direction: rtl;
                 overflow-wrap: break-word; /* Ensure words break to the next line */
@@ -145,18 +205,23 @@
                 width: 350px; 
                 height: 30px; 
                 font-size: 20px; 
-                padding: 0%; 
+                padding: 1%; 
                 margin: 0%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
             #history_btn_screen{
+                display: flex;
+                justify-content: center;
+                align-items: end;
                 margin-top: 20px;
             }
             #calculator{
                 display: inline-block;
-                border: 1px solid black;
                 width: 500px;
                 height: 780px;
-                
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Creates the illusion of depth */
                 padding: 2%;
                 background-color: white;
                 text-align: left;

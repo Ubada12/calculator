@@ -4,6 +4,8 @@
             let number_buttons_locked= false;
             let rates= null;
             let clicked_button= null;
+            let options= null;
+            let checkbox_checked= false; 
             function handle_mousup(textarea_value)
             {
                 console.log(textarea_value);
@@ -256,6 +258,8 @@
                     converter.classList.add('converter_tab_hidden');
                     document.getElementById("source-currency").value= "";
                     document.getElementById("target-currency").value= "";
+                    document.getElementById("source_currency_value").value= "";
+                    document.getElementById("target_currency_value").value= "";
                 }
             }
 
@@ -372,6 +376,36 @@
                 return str;
             }
             
+            function getCryptoExchangeRates(sc_symbol, tc_symbol, sc_input)
+            {
+                return new Promise((resolve, reject) => {
+                    const xhr= new XMLHttpRequest();
+                    xhr.open("GET", `https://pro-api.coinmarketcap.com/v2/tools/price-conversion?amount=${sc_input}&symbol=${sc_symbol}&convert=${tc_symbol}`, true);
+                    xhr.setRequestHeader("X-CMC_PRO_API_KEY", "08b3799a-8f79-411b-9706-db203aed9e71");
+                    xhr.onerror = function () {
+                        reject("An error occurred during the AJAX post request");
+                    };
+                    xhr.onload = function () {
+                        const jsonResponse = JSON.parse(xhr.responseText);
+                        console.log("Server Response:", jsonResponse);
+                        if (xhr.status === 200) 
+                        {
+                            document.querySelector("p").innerHTML= "";
+                            console.log("Successfully sent get request");
+                            // Parse the response and log it
+                            console.log(jsonResponse.data[0].quote[tc_symbol].price);
+                            resolve(jsonResponse.data[0].quote[tc_symbol].price);
+                        }
+                        else 
+                        {
+                            reject("Failed to send get request. Status:", xhr.status);
+                            document.querySelector("p").innerHTML= jsonResponse.status.error_message;
+                        }
+                    };
+                    xhr.send();
+                });
+            }
+
             function getExchangeRates()
             {
                 return new Promise((resolve, reject) => {
@@ -389,11 +423,12 @@
                             console.log("Server Response:", jsonResponse);
                             rates= jsonResponse.conversion_rates;
                             // Populate datalists
-                            let options = `<option value=""></option>`;
+                            options = `<option value=""></option>`;
                             for (const key in rates) 
                             {
                                 options += `<option value="${key}">${key}</option>`;
                             }
+                            
                             resolve(options);
                         }
                         else 
@@ -488,10 +523,67 @@
                     xhr.send();
                 });
             }
-            
 
+            function swapValues()
+            {
+                const sc_input= document.getElementById('source_currency_value');
+                const tc_input= document.getElementById('target_currency_value');
+                const sc_symbol= document.getElementById('source-currency');
+                const tc_symbol= document.getElementById('target-currency');
+
+                const temp_sc_symbol_value= sc_symbol.value;
+                const temp_sc_input_value= sc_input.value; 
+
+                sc_symbol.value= tc_symbol.value;
+                tc_symbol.value= temp_sc_symbol_value;
+                sc_input.value= tc_input.value;
+                tc_input.value= temp_sc_input_value;
+            }
+
+            function formatNumber(num) {
+                if (Number.isInteger(num)) {
+                    return num; // If it's an integer, return it as is
+                } else {
+                    return parseFloat(num.toFixed(7)); // Otherwise, round it to 2 decimal places
+                }
+            }
+            
             document.addEventListener('DOMContentLoaded', function() {
                 currency_exchanger();
+
+                const toggle= document.getElementById("toggle");
+                const span_fiat= document.getElementById("fiat");
+                const span_crytpo= document.getElementById("crypto");
+                toggle.addEventListener("change", function() {
+                    if(toggle.checked)
+                    {
+                        checkbox_checked= true;
+                        span_crytpo.style.fontWeight= "bold";
+                        span_fiat.style.fontWeight= "";
+                        sc_symbol.removeAttribute("readonly");
+                        tc_symbol.removeAttribute("readonly");
+                        sc_symbol.style.boxShadow= "inset 0 4px 10px rgba(0, 0, 0, 0.25)";
+                        tc_symbol.style.boxShadow= "inset 0 4px 10px rgba(0, 0, 0, 0.25)";
+                        document.getElementById("source-currency").value= "";
+                        document.getElementById("target-currency").value= "";
+                        document.getElementById("source_currency_value").value= "";
+                        document.getElementById("target_currency_value").value= "";
+                    }
+                    else
+                    {
+                        checkbox_checked= false;
+                        span_fiat.style.fontWeight= "bold";
+                        span_crytpo.style.fontWeight= "";
+                        sc_symbol.style.boxShadow= "none";
+                        tc_symbol.style.boxShadow= "none";
+                        sc_symbol.setAttribute("readonly", "");
+                        tc_symbol.setAttribute("readonly", "");
+                        document.getElementById("source-currency").value= "";
+                        document.getElementById("target-currency").value= "";
+                        document.getElementById("source_currency_value").value= "";
+                        document.getElementById("target_currency_value").value= "";
+                    }
+                });
                 
                 const choices= document.getElementById("choices");
                 const converter_tab= document.getElementById("comman_converter_div");
@@ -552,13 +644,32 @@
                             document.getElementById('inputs').innerHTML= document.getElementById('inputs').value + keys[i].innerHTML;
                         else if(currency_tab_div.classList.contains("converter_tab_visible") && keys[i].id !== "erase")
                             sc_input.value+= keys[i].innerHTML;
-                        if(currency_tab_div.classList.contains("converter_tab_visible") && sc_input.value !== 0 && sc_symbol.value !== 0 && tc_symbol.value !== 0)
+                        if(currency_tab_div.classList.contains("converter_tab_visible") && sc_input.value.length !== 0 && sc_symbol.value.length !== 0 && tc_symbol.value.length !== 0)
                         {
-                            actual_conversion(sc_symbol.value, tc_symbol.value, sc_input.value)
-                                .then((converted_value) => {
-                                    tc_input.value= converted_value;
-                                })
-                                .catch((error) => console.log(error));
+                            if(checkbox_checked && /^[a-zA-Z]+$/.test(sc_symbol.value) && /^[a-zA-Z]+$/.test(tc_symbol.value))
+                            {
+                                sc_symbol.value= sc_symbol.value.toUpperCase();
+                                tc_symbol.value= tc_symbol.value.toUpperCase();
+                                getCryptoExchangeRates(sc_symbol.value, tc_symbol.value, sc_input.value.replace(/,/g, ""))
+                                    .then((converted_value) => {
+                                        console.log(converted_value);
+                                        tc_input.value= formatNumber(converted_value);
+                                    })
+                                    .catch((error) => console.log(error));
+                            }
+                            else if(!checkbox_checked)
+                            {
+                                actual_conversion(sc_symbol.value, tc_symbol.value, sc_input.value.replace(/,/g, ""))
+                                    .then((converted_value) => {
+                                        tc_input.value= formatNumber(converted_value);
+                                    })
+                                    .catch((error) => console.log(error));
+                            }
+                            else
+                            {
+                                console.log("failed "+ /^[a-zA-Z]+$/.test(sc_symbol.value) + " " + /^[a-zA-Z]+$/.test(tc_symbol.value));
+                                console.log(sc_symbol.value +" " + tc_symbol.value);
+                            }
                         }
                     });
                 }
