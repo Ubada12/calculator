@@ -2,7 +2,7 @@
 
 function getData()
 {
-    $con = new mysqli("localhost", "root", "ubadagh098", "calculator", 3307);
+    $con = new mysqli("localhost", "root", "YOUR_PASSWORD", "calculator", 3307);
 
     if ($con->connect_error) 
     {
@@ -27,7 +27,7 @@ function getData()
 
 function insert($time, $input, $result)
 {
-    $con = new mysqli("localhost", "root", "ubadagh098", "calculator", 3307);
+    $con = new mysqli("localhost", "root", "YOUR_PASSWORD", "calculator", 3307);
 
     if ($con->connect_error) 
     {
@@ -53,7 +53,7 @@ function insert($time, $input, $result)
 
 function delete()
 {
-    $con = new mysqli("localhost", "root", "ubadagh098", "calculator", 3307);
+    $con = new mysqli("localhost", "root", "YOUR_PASSWORD", "calculator", 3307);
 
     if ($con->connect_error) 
     {
@@ -76,7 +76,7 @@ function delete()
 
 function setup()
 {
-    $con = new mysqli("localhost", "root", "ubadagh098", "", 3307);
+    $con = new mysqli("localhost", "root", "YOUR_PASSWORD", "", 3307);
 
     if ($con->connect_error) 
     {
